@@ -50,33 +50,31 @@ const Dashboard = () => {
         ? { ...booking, status: 'cancelled' as const }
         : booking
     );
-    
     setBookings(updatedBookings);
     localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-    
     toast({
       title: "Booking Cancelled",
-      description: "Your booking has been successfully cancelled.",
+      description: "Your booking has been cancelled successfully.",
     });
   };
 
   const handleViewBooking = (booking: Booking) => {
     navigate('/booking/confirmation', { 
       state: { 
-        bookingId: booking.id,
-        totalPrice: booking.totalPrice,
-        extras: booking.extras,
-        rentalDays: booking.rentalDays,
-        booking 
+        bookingId: booking.id, 
+        totalPrice: booking.totalPrice, 
+        extras: booking.extras, 
+        rentalDays: booking.rentalDays 
       } 
     });
   };
 
-  const filteredBookings = bookings.filter(booking => 
-    filter === 'all' || booking.status === filter
-  );
+  const filteredBookings = bookings.filter(booking => {
+    if (filter === 'all') return true;
+    return booking.status === filter;
+  });
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'confirmed': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
@@ -107,183 +105,186 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="bookings" className="space-y-6">
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Car className="w-8 h-8 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{bookings.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Bookings</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-8 h-8 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold">
-                    {bookings.filter(b => b.status === 'confirmed').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Active Bookings</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <X className="w-8 h-8 text-red-600" />
-                <div>
-                  <p className="text-2xl font-bold">
-                    {bookings.filter(b => b.status === 'cancelled').length}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Cancelled</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Download className="w-8 h-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">
-                    ₹{bookings.reduce((sum, b) => sum + b.totalPrice, 0)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total Spent</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filter Buttons */}
-        <div className="flex space-x-2 mb-6">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            onClick={() => setFilter('all')}
-          >
-            All Bookings
-          </Button>
-          <Button
-            variant={filter === 'confirmed' ? 'default' : 'outline'}
-            onClick={() => setFilter('confirmed')}
-          >
-            Confirmed
-          </Button>
-          <Button
-            variant={filter === 'cancelled' ? 'default' : 'outline'}
-            onClick={() => setFilter('cancelled')}
-          >
-            Cancelled
-          </Button>
-          <Button
-            variant={filter === 'completed' ? 'default' : 'outline'}
-            onClick={() => setFilter('completed')}
-          >
-            Completed
-          </Button>
-        </div>
-
-        {/* Bookings List */}
-        <div className="space-y-4">
-          {filteredBookings.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Car className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
-                <p className="text-muted-foreground mb-4">
-                  {filter === 'all' 
-                    ? "You haven't made any bookings yet." 
-                    : `No ${filter} bookings found.`
-                  }
-                </p>
-                <Button onClick={() => navigate('/')}>
-                  Book a Car
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            filteredBookings.map((booking) => (
-              <Card key={booking.id}>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <img 
-                        src={booking.car.image} 
-                        alt={booking.car.name}
-                        className="w-16 h-12 object-cover rounded"
-                      />
-                      <div>
-                        <h3 className="font-semibold text-lg">{booking.car.name}</h3>
-                        <p className="text-sm text-muted-foreground">{booking.car.category}</p>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="w-4 h-4" />
-                            <span>{booking.searchParams.location}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{booking.pickupDate}</span>
-                          </div>
-                        </div>
-                      </div>
+                  <div className="flex items-center space-x-2">
+                    <Car className="w-8 h-8 text-primary" />
+                    <div>
+                      <p className="text-2xl font-bold">{bookings.length}</p>
+                      <p className="text-sm text-muted-foreground">Total Bookings</p>
                     </div>
-                    
-                    <div className="text-right">
-                      <Badge className={`mb-2 ${getStatusColor(booking.status)}`}>
-                        {booking.status}
-                      </Badge>
-                      <p className="text-lg font-semibold">₹{booking.totalPrice}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {booking.rentalDays} day{booking.rentalDays > 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end space-x-2 mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewBooking(booking)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
-                    
-                    {booking.status === 'confirmed' && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate(`/booking/modify/${booking.id}`)}
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Modify
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCancelBooking(booking.id)}
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Cancel
-                        </Button>
-                      </>
-                    )}
                   </div>
                 </CardContent>
               </Card>
-            ))
-          )}
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-8 h-8 text-green-600" />
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {bookings.filter(b => b.status === 'confirmed').length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Active Bookings</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <X className="w-8 h-8 text-red-600" />
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {bookings.filter(b => b.status === 'cancelled').length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Cancelled</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Download className="w-8 h-8 text-blue-600" />
+                    <div>
+                      <p className="text-2xl font-bold">
+                        ₹{bookings.reduce((sum, b) => sum + b.totalPrice, 0)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">Total Spent</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex space-x-2">
+              <Button
+                variant={filter === 'all' ? 'default' : 'outline'}
+                onClick={() => setFilter('all')}
+              >
+                All Bookings
+              </Button>
+              <Button
+                variant={filter === 'confirmed' ? 'default' : 'outline'}
+                onClick={() => setFilter('confirmed')}
+              >
+                Confirmed
+              </Button>
+              <Button
+                variant={filter === 'cancelled' ? 'default' : 'outline'}
+                onClick={() => setFilter('cancelled')}
+              >
+                Cancelled
+              </Button>
+              <Button
+                variant={filter === 'completed' ? 'default' : 'outline'}
+                onClick={() => setFilter('completed')}
+              >
+                Completed
+              </Button>
+            </div>
+
+            {/* Bookings List */}
+            <div className="space-y-4">
+              {filteredBookings.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Car className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
+                    <p className="text-muted-foreground mb-4">
+                      {filter === 'all' 
+                        ? "You haven't made any bookings yet." 
+                        : `No ${filter} bookings found.`
+                      }
+                    </p>
+                    <Button onClick={() => navigate('/')}>
+                      Browse Cars
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredBookings.map((booking) => (
+                  <Card key={booking.id}>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <div className="flex items-center space-x-4 mb-4 md:mb-0">
+                          <img 
+                            src={booking.car.image} 
+                            alt={booking.car.name}
+                            className="w-20 h-16 object-cover rounded-lg"
+                          />
+                          <div>
+                            <h3 className="text-lg font-semibold">{booking.car.name}</h3>
+                            <p className="text-muted-foreground">{booking.car.category}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Booking ID: {booking.id}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={getStatusBadgeColor(booking.status)}>
+                          {booking.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">{booking.searchParams.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">
+                            {booking.pickupDate} - {booking.returnDate}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Download className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-semibold">₹{booking.totalPrice}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewBooking(booking)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                        
+                        {booking.status === 'confirmed' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/booking/modify/${booking.id}`)}
+                            >
+                              <Edit className="w-4 h-4 mr-2" />
+                              Modify
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCancelBooking(booking.id)}
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              Cancel
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6">
