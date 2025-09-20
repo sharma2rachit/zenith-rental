@@ -98,22 +98,15 @@ const BookingDetails = () => {
   const onSubmit = async (data: FormData) => {
     updateCustomerDetails(data);
     
-    // Simulate booking submission
     try {
       toast({
-        title: "Processing your booking...",
-        description: "Please wait while we confirm your reservation.",
+        title: "Redirecting to payment...",
+        description: "Please complete your payment to confirm the booking.",
       });
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful booking
-      const bookingId = 'RZ' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      
-      navigate('/booking/confirmation', { 
+      // Navigate to payment page
+      navigate('/payment', { 
         state: { 
-          bookingId,
           totalPrice: calculateTotalPrice(),
           extras,
           rentalDays 
@@ -121,7 +114,7 @@ const BookingDetails = () => {
       });
     } catch (error) {
       toast({
-        title: "Booking failed",
+        title: "Error occurred",
         description: "There was an error processing your booking. Please try again.",
         variant: "destructive",
       });

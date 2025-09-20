@@ -74,11 +74,11 @@ const Header = () => {
                     <div>{user?.email}</div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Profile
+                  <DropdownMenuItem onClick={() => window.location.href = '/dashboard'}>
+                    Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Bookings
+                  <DropdownMenuItem onClick={() => window.location.href = '/admin'}>
+                    Admin Panel
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
