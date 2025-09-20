@@ -8,12 +8,14 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockCars } from '@/data/mockCars';
 import { useBooking } from '@/contexts/BookingContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 
 const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { bookingData, selectCar } = useBooking();
+  const { isAuthenticated } = useAuth();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const car = mockCars.find(c => c.id === parseInt(id || '0'));
@@ -33,6 +35,11 @@ const CarDetails = () => {
   }
 
   const handleBookNow = () => {
+    if (!isAuthenticated) {
+      // Redirect to home page where user can sign in
+      navigate('/');
+      return;
+    }
     selectCar(car);
     navigate('/booking/details');
   };

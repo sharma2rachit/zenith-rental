@@ -3,10 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Car, Download, Eye, X, Edit } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, MapPin, Car, Download, Eye, X, Edit, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import BookingCalendar from '@/components/BookingCalendar';
+import BookingAnalytics from '@/components/BookingAnalytics';
 
 interface Booking {
   id: string;
@@ -28,6 +31,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filter, setFilter] = useState<'all' | 'confirmed' | 'cancelled' | 'completed'>('all');
+  const [activeTab, setActiveTab] = useState('bookings');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -94,6 +98,15 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.firstName}!</h1>
           <p className="text-muted-foreground">Manage your bookings and rental history</p>
         </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="bookings">My Bookings</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="bookings" className="space-y-6">
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -271,7 +284,16 @@ const Dashboard = () => {
               </Card>
             ))
           )}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="calendar" className="space-y-6">
+            <BookingCalendar bookings={bookings} />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <BookingAnalytics bookings={bookings} user={user} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

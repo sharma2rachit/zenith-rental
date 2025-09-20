@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useBooking } from '@/contexts/BookingContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 
@@ -32,6 +33,7 @@ type FormData = z.infer<typeof formSchema>;
 const BookingDetails = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
   const { bookingData, updateCustomerDetails, updateExtras, calculateTotal } = useBooking();
   const [extras, setExtras] = useState({
     gps: false,
@@ -44,17 +46,52 @@ const BookingDetails = () => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
       licenseNumber: '',
       cardNumber: '',
       expiryDate: '',
       cvv: '',
-      cardholderName: '',
+      cardholderName: user ? `${user.firstName} ${user.lastName}` : '',
     },
   });
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center max-w-md mx-auto">
+            <div className="mb-6">
+              <User className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h1 className="text-2xl font-bold mb-2">Sign In Required</h1>
+              <p className="text-muted-foreground">
+                You need to sign in to make a booking. Please create an account or sign in to continue.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button 
+                onClick={() => navigate('/')}
+                className="w-full bg-gradient-to-r from-primary to-accent"
+              >
+                Sign In / Sign Up
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/')}
+                className="w-full"
+              >
+                Return to Home
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!bookingData.selectedCar) {
     return (
