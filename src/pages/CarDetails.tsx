@@ -35,11 +35,6 @@ const CarDetails = () => {
   }
 
   const handleBookNow = () => {
-    if (!isAuthenticated) {
-      // Redirect to home page where user can sign in
-      navigate('/');
-      return;
-    }
     selectCar(car);
     navigate('/booking/details');
   };

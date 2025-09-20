@@ -58,40 +58,6 @@ const BookingDetails = () => {
     },
   });
 
-  // Check if user is authenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center max-w-md mx-auto">
-            <div className="mb-6">
-              <User className="w-16 h-16 mx-auto text-primary mb-4" />
-              <h1 className="text-2xl font-bold mb-2">Sign In Required</h1>
-              <p className="text-muted-foreground">
-                You need to sign in to make a booking. Please create an account or sign in to continue.
-              </p>
-            </div>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => navigate('/')}
-                className="w-full bg-gradient-to-r from-primary to-accent"
-              >
-                Sign In / Sign Up
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/')}
-                className="w-full"
-              >
-                Return to Home
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!bookingData.selectedCar) {
     return (
@@ -133,6 +99,19 @@ const BookingDetails = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Check if user is authenticated before proceeding
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in or create an account to complete your booking.",
+        variant: "destructive",
+      });
+      // Store form data temporarily and redirect to sign in
+      updateCustomerDetails(data);
+      navigate('/');
+      return;
+    }
+
     updateCustomerDetails(data);
     
     try {
@@ -378,8 +357,14 @@ const BookingDetails = () => {
                       type="submit" 
                       className="w-full mt-6 bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover"
                     >
-                      Complete Booking - ${calculateTotalPrice()}
+                      {isAuthenticated ? `Complete Booking - $${calculateTotalPrice()}` : 'Sign In & Complete Booking'}
                     </Button>
+                    
+                    {!isAuthenticated && (
+                      <p className="text-sm text-muted-foreground text-center mt-2">
+                        You'll be prompted to sign in before finalizing your booking
+                      </p>
+                    )}
                   </form>
                 </Form>
               </CardContent>

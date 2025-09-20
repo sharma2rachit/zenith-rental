@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBooking } from '@/contexts/BookingContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 
@@ -14,6 +15,7 @@ const Payment = () => {
   const location = useLocation();
   const { toast } = useToast();
   const { bookingData, updateCustomerDetails } = useBooking();
+  const { isAuthenticated } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('cash');
   const [paymentData, setPaymentData] = useState({
@@ -31,6 +33,17 @@ const Payment = () => {
   }
 
   const handlePayment = async () => {
+    // Check authentication at final step
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in or create an account to complete your booking.",
+        variant: "destructive",
+      });
+      navigate('/');
+      return;
+    }
+
     setIsProcessing(true);
     
     try {
@@ -221,9 +234,15 @@ const Payment = () => {
                       <span>Processing Payment...</span>
                     </div>
                   ) : (
-                    `Pay ₹${totalPrice || 0}`
+                    isAuthenticated ? `Pay ₹${totalPrice || 0}` : `Sign In & Pay ₹${totalPrice || 0}`
                   )}
                 </Button>
+                
+                {!isAuthenticated && (
+                  <p className="text-sm text-muted-foreground text-center mt-2">
+                    You'll be prompted to sign in before confirming your booking
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
