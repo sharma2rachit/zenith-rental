@@ -10,9 +10,10 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 interface SignUpProps {
   onSwitchToSignIn: () => void;
   onClose?: () => void;
+  onSuccess?: () => void;
 }
 
-const SignUp = ({ onSwitchToSignIn, onClose }: SignUpProps) => {
+const SignUp = ({ onSwitchToSignIn, onClose, onSuccess }: SignUpProps) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -65,7 +66,11 @@ const SignUp = ({ onSwitchToSignIn, onClose }: SignUpProps) => {
       });
       
       if (result.success) {
-        onClose?.();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          onClose?.();
+        }
       } else {
         setError(result.error || 'Sign up failed');
       }

@@ -10,9 +10,10 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 interface SignInProps {
   onSwitchToSignUp: () => void;
   onClose?: () => void;
+  onSuccess?: () => void;
 }
 
-const SignIn = ({ onSwitchToSignUp, onClose }: SignInProps) => {
+const SignIn = ({ onSwitchToSignUp, onClose, onSuccess }: SignInProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +30,11 @@ const SignIn = ({ onSwitchToSignUp, onClose }: SignInProps) => {
     try {
       const result = await signIn(email, password);
       if (result.success) {
-        onClose?.();
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          onClose?.();
+        }
       } else {
         setError(result.error || 'Sign in failed');
       }

@@ -15,6 +15,7 @@ import { useBooking } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import AuthModal from '@/components/AuthModal';
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -35,6 +36,7 @@ const BookingDetails = () => {
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const { bookingData, updateCustomerDetails, updateExtras, calculateTotal } = useBooking();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [extras, setExtras] = useState({
     gps: false,
     childSeat: false,
@@ -99,21 +101,17 @@ const BookingDetails = () => {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Store form data first
+    updateCustomerDetails(data);
+    
     // Check if user is authenticated before proceeding
     if (!isAuthenticated) {
-      toast({
-        title: "Sign In Required",
-        description: "Please sign in or create an account to complete your booking.",
-        variant: "destructive",
-      });
-      // Store form data temporarily and redirect to sign in
-      updateCustomerDetails(data);
-      navigate('/');
+      // Open auth modal instead of redirecting
+      setIsAuthModalOpen(true);
       return;
     }
 
-    updateCustomerDetails(data);
-    
+    // User is authenticated, proceed to payment
     try {
       toast({
         title: "Redirecting to payment...",
@@ -135,6 +133,24 @@ const BookingDetails = () => {
         variant: "destructive",
       });
     }
+  };
+
+  // Handle successful authentication
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    // Automatically proceed to payment after successful auth
+    toast({
+      title: "Welcome back!",
+      description: "Redirecting to payment...",
+    });
+    
+    navigate('/payment', { 
+      state: { 
+        totalPrice: calculateTotalPrice(),
+        extras,
+        rentalDays 
+      } 
+    });
   };
 
   return (
@@ -429,6 +445,14 @@ const BookingDetails = () => {
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+        defaultMode="signin"
+      />
     </div>
   );
 };

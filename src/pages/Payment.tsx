@@ -9,6 +9,7 @@ import { useBooking } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import AuthModal from '@/components/AuthModal';
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Payment = () => {
   const { bookingData, updateCustomerDetails } = useBooking();
   const { isAuthenticated } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('cash');
   const [paymentData, setPaymentData] = useState({
     cardNumber: '',
@@ -35,12 +37,7 @@ const Payment = () => {
   const handlePayment = async () => {
     // Check authentication at final step
     if (!isAuthenticated) {
-      toast({
-        title: "Sign In Required",
-        description: "Please sign in or create an account to complete your booking.",
-        variant: "destructive",
-      });
-      navigate('/');
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -99,6 +96,13 @@ const Payment = () => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // Handle successful authentication
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    // Automatically proceed with payment after successful auth
+    handlePayment();
   };
 
   const car = bookingData.selectedCar;
@@ -316,6 +320,14 @@ const Payment = () => {
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+        defaultMode="signin"
+      />
     </div>
   );
 };

@@ -6,10 +6,11 @@ import SignUp from './SignUp';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   defaultMode?: 'signin' | 'signup';
 }
 
-const AuthModal = ({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, onSuccess, defaultMode = 'signin' }: AuthModalProps) => {
   const [mode, setMode] = useState<'signin' | 'signup'>(defaultMode);
 
   const handleModeSwitch = (newMode: 'signin' | 'signup') => {
@@ -19,6 +20,15 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) 
   const handleClose = () => {
     setMode(defaultMode);
     onClose();
+  };
+
+  const handleAuthSuccess = () => {
+    setMode(defaultMode);
+    if (onSuccess) {
+      onSuccess();
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -40,11 +50,13 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) 
             <SignIn 
               onSwitchToSignUp={() => handleModeSwitch('signup')}
               onClose={handleClose}
+              onSuccess={handleAuthSuccess}
             />
           ) : (
             <SignUp 
               onSwitchToSignIn={() => handleModeSwitch('signin')}
               onClose={handleClose}
+              onSuccess={handleAuthSuccess}
             />
           )}
         </div>
