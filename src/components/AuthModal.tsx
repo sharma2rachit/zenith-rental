@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 
@@ -28,6 +28,12 @@ const AuthModal = ({ isOpen, onClose, defaultMode = 'signin' }: AuthModalProps) 
           <DialogTitle>
             {mode === 'signin' ? 'Sign In' : 'Create Account'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'signin' 
+              ? 'Sign in to your account to continue' 
+              : 'Create a new account to get started'
+            }
+          </DialogDescription>
         </DialogHeader>
         <div className="px-4 pb-4">
           {mode === 'signin' ? (

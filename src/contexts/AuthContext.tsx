@@ -43,9 +43,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Check for existing session on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    try {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      }
+    } catch (error) {
+      console.warn('Failed to load user from localStorage:', error);
+      // Clear corrupted data
+      localStorage.removeItem('user');
     }
     setIsLoading(false);
   }, []);
@@ -82,7 +88,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       
       setUser(userToStore);
-      localStorage.setItem('user', JSON.stringify(userToStore));
+      try {
+        localStorage.setItem('user', JSON.stringify(userToStore));
+      } catch (error) {
+        console.warn('Failed to save user to localStorage:', error);
+      }
       
       return { success: true };
     } catch (error) {
@@ -107,7 +117,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
 
       setUser(userToStore);
-      localStorage.setItem('user', JSON.stringify(userToStore));
+      try {
+        localStorage.setItem('user', JSON.stringify(userToStore));
+      } catch (error) {
+        console.warn('Failed to save user to localStorage:', error);
+      }
       
       return { success: true };
     } catch (error) {
@@ -117,7 +131,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signOut = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    try {
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.warn('Failed to remove user from localStorage:', error);
+    }
   };
 
   const value: AuthContextType = {
