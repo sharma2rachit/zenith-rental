@@ -15,6 +15,7 @@ const Payment = () => {
   const { toast } = useToast();
   const { bookingData, updateCustomerDetails } = useBooking();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('cash');
   const [paymentData, setPaymentData] = useState({
     cardNumber: '',
     expiryDate: '',
@@ -48,11 +49,13 @@ const Payment = () => {
         extras,
         rentalDays,
         totalPrice,
-        paymentData,
+        paymentMethod,
+        paymentData: paymentMethod === 'card' ? paymentData : null,
         status: 'confirmed',
         createdAt: new Date().toISOString(),
         pickupDate: bookingData.searchParams.pickupDate,
-        returnDate: bookingData.searchParams.returnDate || bookingData.searchParams.pickupDate
+        returnDate: bookingData.searchParams.returnDate || bookingData.searchParams.pickupDate,
+        paymentStatus: paymentMethod === 'cash' ? 'pending' : 'completed'
       };
 
       // Get existing bookings
@@ -112,8 +115,40 @@ const Payment = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Card Details */}
+                {/* Payment Method Selection */}
                 <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-medium">Payment Method</Label>
+                    <div className="flex space-x-4 mt-2">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cash"
+                          checked={paymentMethod === 'cash'}
+                          onChange={(e) => setPaymentMethod(e.target.value as 'cash')}
+                          className="w-4 h-4"
+                        />
+                        <span>Cash at Pickup</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="card"
+                          checked={paymentMethod === 'card'}
+                          onChange={(e) => setPaymentMethod(e.target.value as 'card')}
+                          className="w-4 h-4"
+                        />
+                        <span>Credit/Debit Card</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Details - Only show if card payment is selected */}
+                {paymentMethod === 'card' && (
+                  <div className="space-y-4">
                   <div>
                     <Label htmlFor="cardNumber">Card Number</Label>
                     <Input
@@ -155,6 +190,18 @@ const Payment = () => {
                     />
                   </div>
                 </div>
+                )}
+
+                {/* Cash Payment Notice */}
+                {paymentMethod === 'cash' && (
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-semibold text-blue-900 mb-2">Cash Payment at Pickup</h4>
+                    <p className="text-sm text-blue-800">
+                      You will pay ₹{totalPrice || 0} in cash when you pick up the vehicle. 
+                      Please bring exact change and a valid ID.
+                    </p>
+                  </div>
+                )}
 
                 {/* Security Notice */}
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -165,7 +212,7 @@ const Payment = () => {
                 {/* Payment Button */}
                 <Button
                   onClick={handlePayment}
-                  disabled={isProcessing || !paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv || !paymentData.cardholderName}
+                  disabled={isProcessing || (paymentMethod === 'card' && (!paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv || !paymentData.cardholderName))}
                   className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover"
                 >
                   {isProcessing ? (

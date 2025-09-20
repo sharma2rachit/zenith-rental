@@ -13,6 +13,7 @@ import Payment from "./pages/Payment";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import BookingModification from "./pages/BookingModification";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/booking/confirmation" element={<BookingConfirmation />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/booking/modify/:bookingId" element={<BookingModification />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
