@@ -2,9 +2,37 @@ import { Calendar, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { useBooking } from "@/contexts/BookingContext";
 import heroBackground from "@/assets/hero-background.jpg";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const { updateSearchParams } = useBooking();
+
+  const handleSearch = () => {
+    const location = (document.querySelector('input[placeholder="Enter city or airport"]') as HTMLInputElement)?.value;
+    const pickupDate = (document.querySelector('input[type="date"]') as HTMLInputElement)?.value;
+    const pickupTime = (document.querySelector('input[type="time"]') as HTMLInputElement)?.value;
+    
+    // Update booking context with search params
+    updateSearchParams({
+      location: location || '',
+      pickupDate: pickupDate || '',
+      pickupTime: pickupTime || '',
+      returnDate: '',
+      returnTime: ''
+    });
+    
+    // Navigate to search results
+    const params = new URLSearchParams();
+    if (location) params.set('location', location);
+    if (pickupDate) params.set('pickupDate', pickupDate);
+    if (pickupTime) params.set('pickupTime', pickupTime);
+    
+    navigate(`/search?${params.toString()}`);
+  };
+
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -57,18 +85,7 @@ const HeroSection = () => {
               <div className="flex items-end">
                 <Button 
                   className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-white font-semibold py-3"
-                  onClick={() => {
-                    const location = (document.querySelector('input[placeholder="Enter city or airport"]') as HTMLInputElement)?.value;
-                    const pickupDate = (document.querySelector('input[type="date"]') as HTMLInputElement)?.value;
-                    const pickupTime = (document.querySelector('input[type="time"]') as HTMLInputElement)?.value;
-                    
-                    const params = new URLSearchParams();
-                    if (location) params.set('location', location);
-                    if (pickupDate) params.set('pickupDate', pickupDate);
-                    if (pickupTime) params.set('pickupTime', pickupTime);
-                    
-                    window.location.href = `/search?${params.toString()}`;
-                  }}
+                  onClick={handleSearch}
                 >
                   Search Cars
                 </Button>
