@@ -20,5 +20,37 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+
+ <!-- Universal Snippet Integration -->
+ <script>
+  (function(w,d){
+    w.framtt=w.framtt||{q:[],_init:false};
+    w.framtt.init=function(cfg){w.framtt.cfg=cfg;w.framtt._init=true;};
+    w.framtt.track=function(eventName,payload){w.framtt.q.push({eventName,payload,ts:Date.now()});};
+    w.framtt.submitBooking=function(data){w.framtt.q.push({eventName:'booking_submitted',payload:data,ts:Date.now()});};
+    
+    var s=d.createElement('script');
+    s.async=true;
+    s.src='https://cdn.framtt.com/framtt.v2.js'; // Load the enhanced snippet
+    s.onload=function(){
+      framtt.init({
+        snippetId:'80732',
+        apiHost:'https://api.framtt.com/snippet',
+        autoCaptureForms:true,
+        debug:true,
+        universalDetection:true,
+        realTimeMonitoring:true,
+        crossPageCollection:true,
+        performanceOptimized:true,
+        confidenceThreshold:0.6
+      });
+    };
+    s.onerror=function(){console.error('Failed to load Framtt script');};
+    d.head.appendChild(s);
+  })(window,document);
+  </script>
+
+
   </body>
 </html>
